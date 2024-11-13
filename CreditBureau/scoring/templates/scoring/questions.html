@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Score Questions</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Answer the Questions</h1>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#questionModal">Start</button>
+
+        <form id="responsesForm" method="POST" style="display:none;">
+            {% csrf_token %}
+            {% for question in questions %}
+                <div class="question" id="question_{{ question.id }}">
+                    <h5>{{ question.text }}</h5>
+                    <input type="radio" name="question_{{ question.id }}" value="A"> A<br>
+                    <input type="radio" name="question_{{ question.id }}" value="B"> B<br>
+                    <input type="radio" name="question_{{ question.id }}" value="C"> C<br>
+                    <input type="radio" name="question_{{ question.id }}" value="D"> D<br>
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+
+        <div class="modal" id="questionModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Question</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="questionText"></p>
+                        <input type="radio" name="answer" value="A"> A<br>
+                        <input type="radio" name="answer" value="B"> B<br>
+                        <input type="radio" name="answer" value="C"> C<br>
+                        <input type="radio" name="answer" value="D"> D<br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="nextQuestion">Next</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let currentQuestion = 0;
+            const questions = $('.question');
+            const totalQuestions = questions.length;
+
+            function showQuestion(index) {
+                questions.hide();
+                $(questions[index]).show();
+                $('#questionText').text($(questions[index]).find('h5').text());
+                $('#questionModal').modal('show');
+            }
+
+            $('#nextQuestion').click(function() {
+                const selectedAnswer = $('input[name="answer"]:checked').val();
+                if (selectedAnswer) {
+                    $('input[name="question_' + (currentQuestion + 1) + '"]').val(selectedAnswer);
+                    currentQuestion++;
+                    if (currentQuestion < totalQuestions) {
+                        showQuestion(currentQuestion);
+                    } else {
+                        $('#questionModal').modal('hide');
+                        $('#responsesForm').submit();
+                    }
+                } else {
+                    alert('Please select an answer.');
+                }
+            });
+
+            showQuestion(currentQuestion);
+        });
+    </script>
+</body>
+</html>

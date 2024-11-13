@@ -1,0 +1,33 @@
+{% comment %} <!-- scoring/templates/scoring/form_page.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Credit Score Form</title>
+    <script>
+        function showNextQuestion(index) {
+            document.querySelectorAll('.question')[index].style.display = 'none';
+            if (index + 1 < document.querySelectorAll('.question').length) {
+                document.querySelectorAll('.question')[index + 1].style.display = 'block';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Answer the Questions</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {% for question in questions %}
+            <div class="question" style="{% if not forloop.first %}display:none{% endif %}">
+                <p>{{ question.text }}</p>
+                {% for choice in question.OPTION_CHOICES %}
+                    <input type="radio" name="question_{{ question.id }}" value="{{ choice.0 }}" required>
+                    {{ choice.1 }}<br>
+                {% endfor %}
+                <button type="button" onclick="showNextQuestion({{ forloop.counter0 }})">Next</button>
+            </div>
+        {% endfor %}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html> {% endcomment %}
